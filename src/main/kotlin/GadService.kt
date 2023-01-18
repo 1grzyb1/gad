@@ -3,7 +3,8 @@ import com.google.api.services.sheets.v4.model.Sheet
 
 internal class GadService(
   private val driveAdapter: DriveAdapter,
-  private val sheetsAdapter: SpreadSheetsAdapter
+  private val sheetsAdapter: SpreadSheetsAdapter,
+  private val problemPunctuationCells: Map<String, PunctationCells>,
 ) {
 
   private val templates = getTemplates()
@@ -21,19 +22,28 @@ internal class GadService(
 
     val teams = sheetsAdapter.geTeams(title)
 
-    processTeams(teams)
+    processTeams(teams, title)
   }
 
-  private fun processTeams(teams: Teams) {
+  private fun processTeams(teams: Teams, sheetTite: String) {
     for (team in teams.teams) {
-      val template = getTemplate(team.code)
+      val template = getTemplate(team.getProblem()[0])
 
       val file = driveAdapter.copyFile(template.id, team.getFileName())
       templateCell(file.id, "A1", team.getAge())
       templateCell(file.id, "A2", team.teamName)
       templateCell(file.id, "A3", teams.judges)
+
+      val cells = problemPunctuationCells[team.getProblem()]!!
+      sheetsAdapter.writeZsp("F${team.zspIndex}", getZspValue(file.id, cells.dt), sheetTite)
+      sheetsAdapter.writeZsp("G${team.zspIndex}", getZspValue(file.id, cells.style), sheetTite)
+      sheetsAdapter.writeZsp("H${team.zspIndex}", getZspValue(file.id, cells.penalty), sheetTite)
       println("Created: ${file.name}")
     }
+  }
+
+  private fun getZspValue(sheetId: String, cell: String): String {
+    return "=importrange(\"https://docs.google.com/spreadsheets/d/$sheetId\";\"Arkusz Ocen Surowych!$cell\")"
   }
 
   private fun templateCell(sheetId: String, cell: String, value: String) {
@@ -41,8 +51,7 @@ internal class GadService(
     sheetsAdapter.writeCell(cell, cellValue.replace("XXX", value), sheetId)
   }
 
-  private fun getTemplate(code: String): File {
-    val problem = code[1]
+  private fun getTemplate(problem: Char): File {
     return templates[problem]!!
   }
 

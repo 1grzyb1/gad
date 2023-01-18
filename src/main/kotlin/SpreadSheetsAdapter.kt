@@ -17,9 +17,17 @@ internal class SpreadSheetsAdapter(
     .setApplicationName("gad")
     .build()
 
+  fun writeZsp(row: String, value: String, sheetName: String) {
+    val range = "$sheetName!$row"
+    val valueRange = listOf(listOf(value))
+    service.spreadsheets().values().update(zspId, range, ValueRange().setValues(valueRange))
+      .setValueInputOption("USER_ENTERED")
+      .execute()
+  }
+
   fun writeCell(row: String, value: String, sheetId: String) {
     val range = "Arkusz Ocen Cząstkowych!$row"
-    val valueRange = listOf(listOf<String>(value))
+    val valueRange = listOf(listOf(value))
     service.spreadsheets().values().update(sheetId, range, ValueRange().setValues(valueRange))
       .setValueInputOption("RAW")
       .execute()
@@ -38,10 +46,10 @@ internal class SpreadSheetsAdapter(
   }
 
   fun geTeams(sheetName: String): Teams {
-    val values = service.spreadsheets().values().get(zspId, "$sheetName!A2:C").execute().getValues()
+    val values = service.spreadsheets().values().get(zspId, "$sheetName!A1:C").execute().getValues()
     val teams = mutableListOf<Team>()
     var judges = ""
-    for (row in values) {
+    for ((i, row) in values.withIndex()) {
 
       if (row.size > 0 && isJudge(row[0].toString())) {
         judges = row[1].toString()
@@ -52,7 +60,7 @@ internal class SpreadSheetsAdapter(
         continue
       }
 
-      teams.add(Team(row[0].toString(), row[1].toString(), row[2].toString()))
+      teams.add(Team(row[0].toString(), row[1].toString(), row[2].toString(), i+1))
     }
     return Teams(judges, teams)
   }
