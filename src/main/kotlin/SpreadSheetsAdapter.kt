@@ -17,9 +17,9 @@ internal class SpreadSheetsAdapter(
     .setApplicationName("gad")
     .build()
 
-  fun writeZsp(row: String, value: String, sheetName: String) {
+  fun writeZsp(row: String, value: List<String>, sheetName: String) {
     val range = "$sheetName!$row"
-    val valueRange = listOf(listOf(value))
+    val valueRange = listOf(value)
     service.spreadsheets().values().update(zspId, range, ValueRange().setValues(valueRange))
       .setValueInputOption("USER_ENTERED")
       .execute()

@@ -35,9 +35,8 @@ internal class GadService(
       templateCell(file.id, "A3", teams.judges)
 
       val cells = problemPunctuationCells[team.getProblem()]!!
-      sheetsAdapter.writeZsp("F${team.zspIndex}", getZspValue(file.id, cells.dt), sheetTite)
-      sheetsAdapter.writeZsp("G${team.zspIndex}", getZspValue(file.id, cells.style), sheetTite)
-      sheetsAdapter.writeZsp("H${team.zspIndex}", getZspValue(file.id, cells.penalty), sheetTite)
+      val values = listOf(getZspValue(file.id, cells.dt), getZspValue(file.id, cells.style), getZspValue(file.id, cells.penalty))
+      sheetsAdapter.writeZsp("F${team.zspIndex}:H${team.zspIndex}", values, sheetTite)
       println("Created: ${file.name}")
     }
   }
