@@ -5,7 +5,12 @@ import com.google.api.client.json.JsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 
-internal class DriveAdapter(credentials: Credential, jsonFactory: JsonFactory, val fromFolderId: String) {
+internal class DriveAdapter(
+  credentials: Credential,
+  jsonFactory: JsonFactory,
+  val fromFolderId: String,
+  val toFolderId: String
+) {
 
   private val httpTransport: NetHttpTransport = GoogleNetHttpTransport.newTrustedTransport()
   private val service: Drive = Drive.Builder(httpTransport, jsonFactory, credentials)
@@ -23,6 +28,7 @@ internal class DriveAdapter(credentials: Credential, jsonFactory: JsonFactory, v
   fun copyFile(fileId: String, newName: String): File {
     val file = File()
     file.name = newName
+    file.parents = listOf(toFolderId)
     return service.Files().copy(fileId, file).execute()
   }
 }

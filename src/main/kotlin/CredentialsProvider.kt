@@ -29,7 +29,7 @@ internal class CredentialsProvider {
   fun getCredentials(): Credential {
 
     val credentialsStream =
-      DriveQuickstart::class.java.getResourceAsStream(credentialFilePath)
+      CredentialsProvider::class.java.getResourceAsStream(credentialFilePath)
         ?: throw FileNotFoundException("Resource not found: $credentialFilePath")
     val clientSecrets: GoogleClientSecrets = GoogleClientSecrets.load(
       jsonFactory,
