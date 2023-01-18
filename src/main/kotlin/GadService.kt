@@ -20,13 +20,14 @@ internal class GadService(
     println("Processing: $title")
 
     val teams = sheetsAdapter.geTeams(title)
-    val template = getTemplate(title)
 
-    processTeams(teams, template)
+    processTeams(teams)
   }
 
-  private fun processTeams(teams: Teams, template: File) {
+  private fun processTeams(teams: Teams) {
     for (team in teams.teams) {
+      val template = getTemplate(team.code)
+
       val file = driveAdapter.copyFile(template.id, team.getFileName())
       templateCell(file.id, "A1", team.getAge())
       templateCell(file.id, "A2", team.teamName)
@@ -40,8 +41,8 @@ internal class GadService(
     sheetsAdapter.writeCell(cell, cellValue.replace("XXX", value), sheetId)
   }
 
-  private fun getTemplate(sheetName: String): File {
-    val problem = sheetName.split(" ")[1][0]
+  private fun getTemplate(code: String): File {
+    val problem = code[1]
     return templates[problem]!!
   }
 
