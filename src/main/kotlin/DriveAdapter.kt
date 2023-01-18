@@ -19,7 +19,7 @@ internal class DriveAdapter(
 
   fun listFiles(): List<File> {
     return service.files().list()
-      .setFields("nextPageToken, files(id, name)")
+//      .setFields("nextPageToken, files(id, name)")
       .setQ("parents in '$fromFolderId'")
       .execute()
       .getFiles()

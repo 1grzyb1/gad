@@ -36,7 +36,7 @@ internal class GadService(
     }
   }
 
-  fun templateCell(sheetId: String, cell: String, value: String) {
+  private fun templateCell(sheetId: String, cell: String, value: String) {
     val cellValue = sheetsAdapter.getCellValue(cell, sheetId)
     sheetsAdapter.writeCell(cell, cellValue.replace("XXX", value), sheetId)
   }
